@@ -6,7 +6,7 @@ const randomInt = (min, max) => {
 }
 // function that capitalizes interest, changes the interest rate and sends a transfer when conditions are met
 const makeTransfer = (account, highestAccount) => {
-  account.saldo -= account.balance * account.commission; // deduction of transfer commission
+  account.balance -= account.balance * account.commission; // deduction of transfer commission
   highestAccount.balance += account.balance; // transfer to a bank account with the highest interest rate
   account.balance = 0; // deleting the account contents after a transfer
 }
