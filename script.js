@@ -4,6 +4,7 @@ const randomInt = (min, max) => {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 // function that capitalizes interest, changes the interest rate and sends a transfer when conditions are met
 const makeTransfer = (account, highestAccount) => {
   account.balance -= account.balance * account.commission; // deduction of transfer commission
@@ -17,6 +18,12 @@ const showTotal = (accountsArray) => {
     accountsArray.map(account => totalCapital += account.balance);
     console.log('Total capital: ', totalCapital);
     accountsArray.map(account => console.log('Capital at ', account.name, ': ', account.balance));
+    const totalCredits = document.querySelector('.total');
+    totalCredits.innerHTML = Math.round(totalCapital * 100) / 100 + ' PLN';
+  }
+
+const refreshView = (accountElement, account) => {
+  accountElement.innerHTML = Math.round(account.balance * 100) / 100 + ' PLN';
 }
 
 // function finding the bank with the currently highest interest rate
@@ -42,7 +49,7 @@ const makeProcess = (account, accountsArray) => {
     account.interestRate = randomInt(1, 20)/100; //change in interest rate after capitalisation
 
     // condition that blocks the function for an account with a balance of 0
-    if(account.balance > 0){ 
+    if(account.balance > 0){
 
       // assigning the account with the highest interest rate to a variable
       const highestAccount = findHighestValue(accountsArray);
@@ -70,7 +77,7 @@ class Account {
 }
 
 // instances of the Account class as owned accounts
-const account1 = new Account('Bank1'); 
+const account1 = new Account('Bank1');
 const account2 = new Account('Bank2');
 const account3 = new Account('Bank3');
 
@@ -78,9 +85,41 @@ const account3 = new Account('Bank3');
 const accountsArray = [];
 accountsArray.push(account1, account2, account3);
 
-showTotal(accountsArray); 
-setInterval(() => {showTotal(accountsArray)}, 60000);
+// HTML elements
+const bank1Element = document.querySelector('.bank1');
+const bank2Element = document.querySelector('.bank2');
+const bank3Element = document.querySelector('.bank3');
+const totalCredits = document.querySelector('.total');
+const status = document.querySelector('.status');
+const buttonStart = document.getElementById('start');
+const buttonStop = document.getElementById('stop');
 
-makeProcess(account1, accountsArray); 
-makeProcess(account2, accountsArray); 
-makeProcess(account3, accountsArray);
+
+
+bank1Element.innerHTML = Math.round(account1.balance * 100) / 100+ ' PLN';
+bank2Element.innerHTML = Math.round(account2.balance * 100) / 100 + ' PLN';
+bank3Element.innerHTML = Math.round(account3.balance * 100) / 100 + ' PLN';
+totalCredits.innerHTML = Math.round((account1.balance + account2.balance + account3.balance) * 100) / 100 + ' PLN';
+
+
+
+buttonStart.addEventListener('click', function(){
+  status.innerHTML = 'the transfer process continues ...'
+  makeProcess(account1, accountsArray);
+  makeProcess(account2, accountsArray);
+  makeProcess(account3, accountsArray);
+  showTotal(accountsArray);
+
+  const showInterval = setInterval(() => {
+    showTotal(accountsArray);
+    refreshView(bank1Element, accountsArray[0]);
+    refreshView(bank2Element, accountsArray[1]);
+    refreshView(bank3Element, accountsArray[2]);
+  }, 10000);
+  ;
+
+  buttonStop.addEventListener('click', function () {
+    clearInterval(showInterval);
+    status.innerHTML = 'Click "START" to begin process';
+  });
+})
